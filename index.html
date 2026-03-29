@@ -1,0 +1,830 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>杨小乖成绩得分记录表</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+SC:wght@400;500;700&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --primary: #f43f5e;
+            --primary-light: #fda4af;
+            --primary-dark: #be123c;
+            --secondary: #06b6d4;
+            --accent: #22c55e;
+            --accent-alt: #f59e0b;
+            --gold: #fbbf24;
+            --bg: #fff1f2;
+            --surface: #ffffff;
+            --border: #fde4d4;
+            --text: #1e293b;
+            --text-light: #64748b;
+            --danger: #f43f5e;
+            --success: #22c55e;
+            --warning: #f59e0b;
+        }
+        
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        
+        body {
+            font-family: 'Noto Sans SC', sans-serif;
+            background: var(--bg);
+            color: var(--text);
+            min-height: 100vh;
+            padding: 40px 20px;
+        }
+        
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+        }
+        
+        .header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 24px;
+        }
+        
+        h1 {
+            font-size: 30px;
+            font-weight: 700;
+            color: var(--primary);
+        }
+        
+        .btn {
+            padding: 10px 20px;
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+            font-size: 14px;
+            font-weight: 500;
+        }
+        
+        .btn-primary {
+            background: var(--primary);
+            color: white;
+        }
+        
+        .btn-primary:hover {
+            background: var(--primary-dark);
+        }
+        
+        .btn-danger {
+            background: var(--danger);
+            color: white;
+            padding: 6px 14px;
+            font-size: 12px;
+        }
+        
+        .btn-danger:hover {
+            background: #dc2626;
+        }
+        
+        .card {
+            background: var(--surface);
+            border-radius: 4px;
+            border: 1px solid var(--border);
+            margin-bottom: 20px;
+        }
+        
+        .card-title {
+            font-size: 16px;
+            font-weight: 600;
+            padding: 16px 24px;
+            background: var(--surface);
+            border-bottom: 1px solid var(--border);
+            color: var(--primary);
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+        
+        .card-title::before {
+            content: '';
+            width: 4px;
+            height: 18px;
+            background: var(--primary);
+            border-radius: 2px;
+        }
+        
+        .table-wrap {
+            overflow-x: auto;
+        }
+        
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            min-width: 1100px;
+        }
+        
+        th {
+            background: var(--primary);
+            color: white;
+            padding: 14px 12px;
+            text-align: center;
+            font-weight: 500;
+            font-size: 13px;
+            letter-spacing: 0.5px;
+        }
+        
+        th:first-child {
+            border-radius: 0;
+        }
+        
+        th:last-child {
+            border-radius: 0;
+        }
+        
+        td {
+            padding: 12px 8px;
+            text-align: center;
+            border-bottom: 1px solid var(--border);
+        }
+        
+        tbody tr:nth-child(even) {
+            background: #fefce8;
+        }
+        
+        tbody tr:hover {
+            background: #fff1f2;
+        }
+        
+        select, input[type="text"], input[type="file"], textarea {
+            width: 100%;
+            padding: 10px 12px;
+            border: 1px solid var(--border);
+            border-radius: 4px;
+            font-size: 14px;
+            font-family: inherit;
+            background: white;
+        }
+        
+        textarea {
+            resize: vertical;
+            min-height: 32px;
+            width: 120px;
+        }
+        
+        select:focus, input:focus, textarea:focus {
+            outline: none;
+            border-color: var(--primary);
+        }
+        
+        input[type="file"] {
+            padding: 6px;
+            font-size: 12px;
+        }
+        
+        .file-name {
+            font-size: 11px;
+            color: var(--text-light);
+            max-width: 100px;
+            overflow: hidden;
+            text-overflow: ellipsis;
+            white-space: nowrap;
+        }
+        
+        .form-row {
+            display: flex;
+            gap: 12px;
+            align-items: center;
+            justify-content: center;
+            padding: 20px;
+            background: #fff7ed;
+            border-top: 1px solid var(--border);
+            flex-wrap: wrap;
+        }
+        
+        .form-group {
+            display: flex;
+            flex-direction: column;
+            gap: 6px;
+        }
+        
+        .form-group label {
+            font-size: 12px;
+            color: var(--text-light);
+            font-weight: 500;
+        }
+        
+        .form-group select, .form-group input, .form-group textarea {
+            width: 130px;
+        }
+        
+        .empty-state {
+            padding: 60px 20px;
+            text-align: center;
+            color: var(--text-light);
+        }
+        
+        .empty-state svg {
+            width: 64px;
+            height: 64px;
+            margin-bottom: 16px;
+            opacity: 0.5;
+        }
+        
+        .stats {
+            display: flex;
+            gap: 32px;
+            padding: 18px 24px;
+            background: #fff7ed;
+            border-bottom: 1px solid var(--border);
+        }
+        
+        .stat-item {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+        
+        .stat-label {
+            font-size: 13px;
+            color: var(--text-light);
+            font-weight: 500;
+        }
+        
+        .stat-value {
+            font-size: 20px;
+            font-weight: 700;
+            color: var(--secondary);
+        }
+        
+        .file-cell {
+            max-width: 120px;
+            overflow: hidden;
+            text-overflow: ellipsis;
+            white-space: nowrap;
+            font-size: 12px;
+        }
+        
+        .file-preview {
+            display: inline-flex;
+            align-items: center;
+            gap: 4px;
+            padding: 4px 8px;
+            background: #dbeafe;
+            border-radius: 4px;
+            font-size: 11px;
+            color: var(--primary);
+            cursor: pointer;
+        }
+        
+        .file-preview:hover {
+            background: var(--secondary);
+            color: white;
+        }
+        
+        /* 本周总分区域 */
+        .week-summary {
+            display: flex;
+            gap: 24px;
+            padding: 24px;
+            align-items: center;
+            background: #fff1f2;
+        }
+        
+        .week-summary-item {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+        }
+        
+        .week-summary-label {
+            font-size: 15px;
+            font-weight: 500;
+            color: var(--text);
+        }
+        
+        .week-summary-value {
+            font-size: 48px;
+            font-weight: 800;
+            color: var(--primary);
+            letter-spacing: -1px;
+        }
+        
+        .week-summary-divider {
+            width: 2px;
+            height: 40px;
+            background: var(--primary-light);
+        }
+        
+        .reward {
+            font-size: 20px;
+            font-weight: 700;
+            padding: 10px 24px;
+            border-radius: 4px;
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+        }
+        
+        .reward-good {
+            background: #d1fae5;
+            color: #047857;
+            border: 1px solid #10b981;
+        }
+        
+        .reward-bad {
+            background: #ffe4e6;
+            color: #be123c;
+            border: 1px solid #f43f5e;
+        }
+        
+        .reward-neutral {
+            background: #fef3c7;
+            color: #b45309;
+            border: 1px solid #f59e0b;
+        }
+        
+        .week-date-range {
+            margin-left: auto;
+            font-size: 14px;
+            color: var(--text-light);
+            font-weight: 500;
+        }
+        
+        /* 科目标签样式 */
+        .subject-tag {
+            display: inline-block;
+            padding: 4px 12px;
+            border-radius: 4px;
+            font-size: 13px;
+            font-weight: 600;
+        }
+        
+        .subject-yu { background: #dbeafe; color: #1d4ed8; }
+        .subject-shu { background: #dcfce7; color: #15803d; }
+        .subject-wai { background: #fae8ff; color: #7c3aed; }
+        
+        /* 核实状态标签 */
+        .verify-tag {
+            display: inline-block;
+            padding: 4px 10px;
+            border-radius: 4px;
+            font-size: 12px;
+            font-weight: 600;
+        }
+        
+        .verify-confirm {
+            background: #d1fae5;
+            color: #047857;
+        }
+        
+        .verify-deduct {
+            background: #fee2e2;
+            color: #dc2626;
+        }
+        
+        .verify-cancel {
+            background: #f3f4f6;
+            color: #6b7280;
+        }
+        
+        /* 实得分特殊样式 */
+        .score-positive { color: var(--success) !important; font-weight: 700 !important; }
+        .score-negative { color: var(--danger) !important; font-weight: 700 !important; }
+        .score-zero { color: var(--text-light) !important; }
+
+        @media (max-width: 768px) {
+            body {
+                padding: 20px 12px;
+            }
+            
+            h1 {
+                font-size: 22px;
+            }
+            
+            .form-row {
+                flex-wrap: wrap;
+            }
+            
+            .form-group select, .form-group input, .form-group textarea {
+                width: 100%;
+            }
+            
+            .week-summary {
+                flex-direction: column;
+                align-items: flex-start;
+                gap: 16px;
+                padding: 20px;
+            }
+            
+            .week-summary-divider {
+                display: none;
+            }
+            
+            .week-date-range {
+                margin-left: 0;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <h1>📊 杨小乖成绩记录表</h1>
+            <button class="btn btn-danger" onclick="clearAll()">清空全部</button>
+        </div>
+        
+        <!-- 本周总分卡片 -->
+        <div class="card">
+            <div class="card-title">🏆 本周成绩龙虎榜</div>
+            <div class="week-summary">
+                <div class="week-summary-item">
+                    <span class="week-summary-label">本周总分</span>
+                    <span class="week-summary-value" id="weekTotalScore">0</span>
+                </div>
+                <div class="week-summary-divider"></div>
+                <div class="week-summary-item">
+                    <span class="week-summary-label">本周奖惩</span>
+                    <span class="reward" id="weekReward">📋 待评估</span>
+                </div>
+                <span class="week-date-range" id="weekRange">📅 -</span>
+            </div>
+        </div>
+        
+        <!-- 记录卡片 -->
+        <div class="card">
+            <div class="stats" id="stats">
+                <div class="stat-item">
+                    <span class="stat-label">记录条数:</span>
+                    <span class="stat-value" id="totalCount">0</span>
+                </div>
+                <div class="stat-item">
+                    <span class="stat-label">实得分合计:</span>
+                    <span class="stat-value" id="totalScore">0</span>
+                </div>
+            </div>
+            
+            <div class="table-wrap">
+                <table id="scoreTable">
+                    <thead>
+                        <tr>
+                            <th style="width:40px">序号</th>
+                            <th style="width:120px">记录日期</th>
+                            <th style="width:70px">科目</th>
+                            <th style="width:100px">来源</th>
+                            <th style="width:100px">成绩级别</th>
+                            <th style="width:60px">得分</th>
+                            <th style="width:130px">附件</th>
+                            <th style="width:90px">得分核实</th>
+                            <th style="width:60px">实得分</th>
+                            <th style="width:130px">说明</th>
+                            <th style="width:50px">操作</th>
+                        </tr>
+                    </thead>
+                    <tbody id="tableBody">
+                    </tbody>
+                </table>
+            </div>
+            
+            <div class="form-row" id="formRow">
+                <div class="form-group">
+                    <label>科目</label>
+                    <select id="newSubject">
+                        <option value="">请选择</option>
+                        <option value="语">语</option>
+                        <option value="数">数</option>
+                        <option value="外">外</option>
+                    </select>
+                </div>
+                <div class="form-group">
+                    <label>来源</label>
+                    <select id="newSource">
+                        <option value="">请选择</option>
+                        <option value="课堂作业">课堂作业</option>
+                        <option value="学校考试">学校考试</option>
+                        <option value="补习小测">补习小测</option>
+                    </select>
+                </div>
+                <div class="form-group">
+                    <label>成绩级别</label>
+                    <select id="newLevel">
+                        <option value="">请选择</option>
+                        <option value="A-">A-及以下</option>
+                        <option value="A">A</option>
+                        <option value="A+">A+</option>
+                        <option value="A++">A++</option>
+                    </select>
+                </div>
+                <div class="form-group">
+                    <label>得分</label>
+                    <input type="text" id="newScore" readonly placeholder="自动计算">
+                </div>
+                <div class="form-group">
+                    <label>附件</label>
+                    <input type="file" id="newAttachment">
+                </div>
+                <div class="form-group">
+                    <label>得分核实</label>
+                    <select id="newVerify">
+                        <option value="">请选择</option>
+                        <option value="确认">确认</option>
+                        <option value="扣分">扣分</option>
+                        <option value="取消">取消</option>
+                    </select>
+                </div>
+                <div class="form-group">
+                    <label>实得分</label>
+                    <input type="text" id="newRealScore" readonly placeholder="自动计算">
+                </div>
+                <div class="form-group">
+                    <label>说明</label>
+                    <textarea id="newNote" placeholder="手动输入"></textarea>
+                </div>
+                <div class="form-group">
+                    <label>&nbsp;</label>
+                    <button class="btn btn-primary" onclick="addRecord()">添加记录</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        const STORAGE_KEY = 'score_records';
+        
+        let records = JSON.parse(localStorage.getItem(STORAGE_KEY) || '[]');
+        
+        const levelScoreMap = {
+            'A-': -1,
+            'A': 0,
+            'A+': 1,
+            'A++': 2
+        };
+        
+        // 星期映射
+        const weekDayMap = ['周日', '周一', '周二', '周三', '周四', '周五', '周六'];
+        
+        function getToday() {
+            const now = new Date();
+            const year = now.getFullYear();
+            const month = String(now.getMonth() + 1).padStart(2, '0');
+            const day = String(now.getDate()).padStart(2, '0');
+            const weekDay = weekDayMap[now.getDay()];
+            return `${year}.${month}.${day}-${weekDay}`;
+        }
+        
+        // 获取当前日期（不带星期）的"YYYY.MM.DD"格式
+        function getDateNoWeek(dateStr) {
+            return dateStr.split('-')[0]; // "2026.03.29-周日" → "2026.03.29"
+        }
+        
+        // 解析日期字符串为Date对象
+        function parseDate(dateStr) {
+            const dateNoWeek = getDateNoWeek(dateStr); // "2026.03.29"
+            const [year, month, day] = dateNoWeek.split('.').map(Number);
+            return new Date(year, month - 1, day);
+        }
+        
+        // 获取本周的周一和周日日期
+        function getWeekRange() {
+            const now = new Date();
+            const dayOfWeek = now.getDay(); // 0=周日, 1=周一, ...
+            const monday = new Date(now);
+            monday.setDate(now.getDate() - (dayOfWeek === 0 ? 6 : dayOfWeek - 1));
+            
+            const sunday = new Date(monday);
+            sunday.setDate(monday.getDate() + 6);
+            
+            const formatDate = (d) => {
+                const year = d.getFullYear();
+                const month = String(d.getMonth() + 1).padStart(2, '0');
+                const day = String(d.getDate()).padStart(2, '0');
+                return `${year}.${month}.${day}`;
+            };
+            
+            return {
+                start: formatDate(monday),
+                end: formatDate(sunday),
+                monday: monday,
+                sunday: sunday
+            };
+        }
+        
+        // 检查记录是否在本周
+        function isThisWeek(dateStr) {
+            const week = getWeekRange();
+            const recordDate = parseDate(dateStr);
+            return recordDate >= week.monday && recordDate <= week.sunday;
+        }
+        
+        function saveRecords() {
+            localStorage.setItem(STORAGE_KEY, JSON.stringify(records));
+            renderTable();
+            updateWeekSummary();
+        }
+        
+        function calculateScore(level) {
+            return levelScoreMap[level] !== undefined ? levelScoreMap[level] : '';
+        }
+        
+        function calculateRealScore(score, verify) {
+            if (!verify) return '';
+            if (verify === '确认') return score;
+            if (verify === '扣分') return -1;
+            return 0; // 取消
+        }
+        
+        function handleFileSelect(event) {
+            const file = event.target.files[0];
+            if (file) {
+                const reader = new FileReader();
+                reader.onload = function(e) {
+                    const fileData = {
+                        name: file.name,
+                        type: file.type,
+                        data: e.target.result
+                    };
+                    window._pendingFileData = fileData;
+                };
+                reader.readAsDataURL(file);
+            }
+        }
+        
+        function addRecord() {
+            const subject = document.getElementById('newSubject').value;
+            const source = document.getElementById('newSource').value;
+            const level = document.getElementById('newLevel').value;
+            const attachmentInput = document.getElementById('newAttachment');
+            const verify = document.getElementById('newVerify').value;
+            const note = document.getElementById('newNote').value.trim();
+            
+            if (!subject || !source || !level || !verify) {
+                alert('请填写完整信息（说明除外）');
+                return;
+            }
+            
+            const score = calculateScore(level);
+            const realScore = calculateRealScore(score, verify);
+            
+            const record = {
+                id: Date.now(),
+                subject,
+                source,
+                level,
+                score,
+                attachment: window._pendingFileData || null,
+                verify,
+                realScore,
+                note: note,
+                date: getToday()
+            };
+            
+            records.push(record);
+            
+            window._pendingFileData = null;
+            attachmentInput.value = '';
+            
+            saveRecords();
+            clearForm();
+        }
+        
+        function clearForm() {
+            document.getElementById('newSubject').value = '';
+            document.getElementById('newSource').value = '';
+            document.getElementById('newLevel').value = '';
+            document.getElementById('newScore').value = '';
+            document.getElementById('newAttachment').value = '';
+            document.getElementById('newVerify').value = '';
+            document.getElementById('newRealScore').value = '';
+            document.getElementById('newNote').value = '';
+            window._pendingFileData = null;
+        }
+        
+        function deleteRecord(id) {
+            if (confirm('确定删除这条记录？')) {
+                records = records.filter(r => r.id !== id);
+                saveRecords();
+            }
+        }
+        
+        function clearAll() {
+            if (confirm('确定清空所有记录？此操作不可恢复！')) {
+                records = [];
+                saveRecords();
+            }
+        }
+        
+        function downloadAttachment(record) {
+            if (!record.attachment) return;
+            const link = document.createElement('a');
+            link.href = record.attachment.data;
+            link.download = record.attachment.name;
+            link.click();
+        }
+        
+        function updateNote(id, newNote) {
+            const record = records.find(r => r.id === id);
+            if (record) {
+                record.note = newNote;
+                saveRecords();
+            }
+        }
+        
+        function renderTable() {
+            const tbody = document.getElementById('tableBody');
+            
+            if (records.length === 0) {
+                tbody.innerHTML = `
+                    <tr>
+                        <td colspan="11">
+                            <div class="empty-state">
+                                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5">
+                                    <path d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"/>
+                                </svg>
+                                <p style="font-size:16px;margin-bottom:8px">📚 还没有记录哦</p>
+                                <p style="font-size:13px">快去添加你的第一笔成绩吧～</p>
+                            </div>
+                        </td>
+                    </tr>
+                `;
+                updateStats();
+                return;
+            }
+            
+            // 按日期降序排列，最新的在前面；同日期按id降序（即id大的更新在前）
+            const sortedRecords = [...records].sort((a, b) => {
+                const dateA = parseDate(a.date);
+                const dateB = parseDate(b.date);
+                if (dateB - dateA !== 0) return dateB - dateA;
+                return b.id - a.id; // id = Date.now()，大的更新
+            });
+            
+            tbody.innerHTML = sortedRecords.map((r, index) => `
+                <tr>
+                    <td style="font-weight:600;color:var(--text-light)">${index + 1}</td>
+                    <td style="font-weight:500">${r.date}</td>
+                    <td><span class="subject-tag subject-${r.subject === '语' ? 'yu' : r.subject === '数' ? 'shu' : 'wai'}">${r.subject}</span></td>
+                    <td style="color:var(--text-light);font-size:13px">${r.source}</td>
+                    <td style="font-weight:600">${r.level === 'A-' ? 'A-及以下' : r.level}</td>
+                    <td style="font-weight:600">${r.score}</td>
+                    <td class="file-cell">
+                        ${r.attachment ? `<span class="file-preview" onclick="downloadAttachment(records.find(x => x.id === ${r.id}))" title="点击下载: ${r.attachment.name}">📎 ${r.attachment.name}</span>` : '-'}
+                    </td>
+                    <td><span class="verify-tag verify-${r.verify === '确认' ? 'confirm' : r.verify === '扣分' ? 'deduct' : 'cancel'}">${r.verify}</span></td>
+                    <td class="${r.realScore > 0 ? 'score-positive' : r.realScore < 0 ? 'score-negative' : 'score-zero'}">${r.realScore}</td>
+                    <td><textarea rows="1" onchange="updateNote(${r.id}, this.value)" placeholder="...">${r.note || ''}</textarea></td>
+                    <td><button class="btn btn-danger" onclick="deleteRecord(${r.id})">🗑 删除</button></td>
+                </tr>
+            `).join('');
+            
+            updateStats();
+        }
+        
+        function updateStats() {
+            document.getElementById('totalCount').textContent = records.length;
+            const total = records.reduce((sum, r) => sum + (parseInt(r.realScore) || 0), 0);
+            document.getElementById('totalScore').textContent = total;
+        }
+        
+        function updateWeekSummary() {
+            const weekRecords = records.filter(r => isThisWeek(r.date));
+            const weekTotal = weekRecords.reduce((sum, r) => sum + (parseInt(r.realScore) || 0), 0);
+            
+            const weekRange = getWeekRange();
+            document.getElementById('weekRange').textContent = `📅 ${weekRange.start} ~ ${weekRange.end}`;
+            document.getElementById('weekTotalScore').textContent = weekTotal;
+            
+            const rewardEl = document.getElementById('weekReward');
+            if (weekTotal >= 5) {
+                rewardEl.textContent = '🎉 +25元零花钱';
+                rewardEl.className = 'reward reward-good';
+            } else if (weekTotal <= 0) {
+                rewardEl.textContent = '😢 -25元教训';
+                rewardEl.className = 'reward reward-bad';
+            } else {
+                rewardEl.textContent = '💪 继续加油';
+                rewardEl.className = 'reward reward-neutral';
+            }
+        }
+        
+        document.getElementById('newLevel').addEventListener('change', function() {
+            const score = calculateScore(this.value);
+            document.getElementById('newScore').value = score;
+            updateRealScore();
+        });
+        
+        document.getElementById('newVerify').addEventListener('change', updateRealScore);
+        
+        document.getElementById('newAttachment').addEventListener('change', handleFileSelect);
+        
+        function updateRealScore() {
+            const score = parseInt(document.getElementById('newScore').value) || 0;
+            const verify = document.getElementById('newVerify').value;
+            const realScore = calculateRealScore(score, verify);
+            document.getElementById('newRealScore').value = realScore;
+        }
+        
+        renderTable();
+        updateWeekSummary();
+    </script>
+</body>
+</html>

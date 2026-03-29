@@ -414,6 +414,49 @@
         .score-positive { color: var(--success) !important; font-weight: 700 !important; }
         .score-negative { color: var(--danger) !important; font-weight: 700 !important; }
         .score-zero { color: var(--text-light) !important; }
+        
+        /* 图片预览弹窗 */
+        .image-modal {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.85);
+            z-index: 9999;
+            justify-content: center;
+            align-items: center;
+            cursor: zoom-out;
+        }
+        
+        .image-modal.active {
+            display: flex;
+        }
+        
+        .image-modal img {
+            max-width: 90%;
+            max-height: 90%;
+            object-fit: contain;
+            border-radius: 4px;
+            cursor: default;
+        }
+        
+        .image-modal .close-btn {
+            position: absolute;
+            top: 20px;
+            right: 20px;
+            color: white;
+            font-size: 32px;
+            cursor: pointer;
+            width: 40px;
+            height: 40px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            background: rgba(255,255,255,0.2);
+            border-radius: 50%;
+        }
 
         @media (max-width: 768px) {
             body {
@@ -572,6 +615,12 @@
                 </div>
             </div>
         </div>
+    </div>
+    
+    <!-- 图片预览弹窗 -->
+    <div class="image-modal" id="imageModal" onclick="closeImageModal(event)">
+        <span class="close-btn" onclick="closeImageModal(event)">×</span>
+        <img id="modalImage" src="" alt="预览">
     </div>
 
     <script>
@@ -782,6 +831,19 @@
             document.getElementById('cancelEditGroup').style.display = 'none';
         }
         
+        function openImageModal(src) {
+            document.getElementById('modalImage').src = src;
+            document.getElementById('imageModal').classList.add('active');
+            document.body.style.overflow = 'hidden';
+        }
+        
+        function closeImageModal(event) {
+            if (event.target.id === 'imageModal' || event.target.classList.contains('close-btn')) {
+                document.getElementById('imageModal').classList.remove('active');
+                document.body.style.overflow = '';
+            }
+        }
+        
         function clearAll() {
             if (confirm('确定清空所有记录？此操作不可恢复！')) {
                 records = [];
@@ -843,7 +905,7 @@
                     <td style="font-weight:600">${r.level === 'A-' ? 'A-及以下' : r.level}</td>
                     <td style="font-weight:600">${r.score}</td>
                     <td class="file-cell">
-                        ${r.attachment ? (r.attachment.type.startsWith('image/') ? `<img src="${r.attachment.data}" style="width:60px;height:40px;object-fit:cover;border-radius:4px;cursor:pointer" onclick="downloadAttachment(records.find(x => x.id === ${r.id}))" title="点击下载: ${r.attachment.name}">` : `<span class="file-preview" onclick="downloadAttachment(records.find(x => x.id === ${r.id}))" title="点击下载: ${r.attachment.name}">📎 ${r.attachment.name}</span>`) : '-'}
+                        ${r.attachment ? (r.attachment.type.startsWith('image/') ? `<img src="${r.attachment.data}" style="width:60px;height:40px;object-fit:cover;border-radius:4px;cursor:pointer" onclick="openImageModal('${r.attachment.data}')" title="点击放大查看">` : `<span class="file-preview" onclick="downloadAttachment(records.find(x => x.id === ${r.id}))" title="点击下载: ${r.attachment.name}">📎 ${r.attachment.name}</span>`) : '-'}
                     </td>
                     <td><span class="verify-tag verify-${r.verify === '确认' ? 'confirm' : r.verify === '扣分' ? 'deduct' : 'cancel'}">${r.verify}</span></td>
                     <td class="${r.realScore > 0 ? 'score-positive' : r.realScore < 0 ? 'score-negative' : 'score-zero'}">${r.realScore}</td>

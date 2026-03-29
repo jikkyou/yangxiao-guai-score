@@ -87,6 +87,28 @@
             background: #dc2626;
         }
         
+        .btn-edit {
+            background: var(--secondary);
+            color: white;
+            padding: 6px 14px;
+            font-size: 12px;
+        }
+        
+        .btn-edit:hover {
+            background: #0891b2;
+        }
+        
+        .btn-cancel {
+            background: #94a3b8;
+            color: white;
+            padding: 6px 14px;
+            font-size: 12px;
+        }
+        
+        .btn-cancel:hover {
+            background: #64748b;
+        }
+        
         .card {
             background: var(--surface);
             border-radius: 4px;
@@ -478,7 +500,7 @@
                             <th style="width:90px">得分核实</th>
                             <th style="width:60px">实得分</th>
                             <th style="width:130px">说明</th>
-                            <th style="width:50px">操作</th>
+                            <th style="width:90px">操作</th>
                         </tr>
                     </thead>
                     <tbody id="tableBody">
@@ -542,7 +564,11 @@
                 </div>
                 <div class="form-group">
                     <label>&nbsp;</label>
-                    <button class="btn btn-primary" onclick="addRecord()">添加记录</button>
+                    <button class="btn btn-primary" id="submitBtn" onclick="addRecord()">添加记录</button>
+                </div>
+                <div class="form-group" id="cancelEditGroup" style="display:none">
+                    <label>&nbsp;</label>
+                    <button class="btn btn-cancel" onclick="cancelEdit()">取消</button>
                 </div>
             </div>
         </div>
@@ -550,6 +576,7 @@
 
     <script>
         const STORAGE_KEY = 'score_records';
+        let editingId = null;
         
         let records = JSON.parse(localStorage.getItem(STORAGE_KEY) || '[]');
         
@@ -665,20 +692,41 @@
             const score = calculateScore(level);
             const realScore = calculateRealScore(score, verify);
             
-            const record = {
-                id: Date.now(),
-                subject,
-                source,
-                level,
-                score,
-                attachment: window._pendingFileData || null,
-                verify,
-                realScore,
-                note: note,
-                date: getToday()
-            };
-            
-            records.push(record);
+            if (editingId) {
+                // 编辑模式：更新现有记录
+                const record = records.find(r => r.id === editingId);
+                if (record) {
+                    record.subject = subject;
+                    record.source = source;
+                    record.level = level;
+                    record.score = score;
+                    record.verify = verify;
+                    record.realScore = realScore;
+                    record.note = note;
+                    // 如果有新附件才更新
+                    if (window._pendingFileData) {
+                        record.attachment = window._pendingFileData;
+                    }
+                }
+                editingId = null;
+                document.getElementById('submitBtn').textContent = '添加记录';
+                document.getElementById('cancelEditGroup').style.display = 'none';
+            } else {
+                // 新增模式
+                const record = {
+                    id: Date.now(),
+                    subject,
+                    source,
+                    level,
+                    score,
+                    attachment: window._pendingFileData || null,
+                    verify,
+                    realScore,
+                    note: note,
+                    date: getToday()
+                };
+                records.push(record);
+            }
             
             window._pendingFileData = null;
             attachmentInput.value = '';
@@ -697,6 +745,7 @@
             document.getElementById('newRealScore').value = '';
             document.getElementById('newNote').value = '';
             window._pendingFileData = null;
+            editingId = null;
         }
         
         function deleteRecord(id) {
@@ -704,6 +753,33 @@
                 records = records.filter(r => r.id !== id);
                 saveRecords();
             }
+        }
+        
+        function startEdit(id) {
+            const record = records.find(r => r.id === id);
+            if (!record) return;
+            
+            editingId = id;
+            document.getElementById('newSubject').value = record.subject;
+            document.getElementById('newSource').value = record.source;
+            document.getElementById('newLevel').value = record.level;
+            document.getElementById('newScore').value = record.score;
+            document.getElementById('newVerify').value = record.verify;
+            document.getElementById('newRealScore').value = record.realScore;
+            document.getElementById('newNote').value = record.note || '';
+            
+            document.getElementById('submitBtn').textContent = '保存修改';
+            document.getElementById('cancelEditGroup').style.display = 'block';
+            
+            // 滚动到表单
+            document.getElementById('formRow').scrollIntoView({ behavior: 'smooth' });
+        }
+        
+        function cancelEdit() {
+            editingId = null;
+            clearForm();
+            document.getElementById('submitBtn').textContent = '添加记录';
+            document.getElementById('cancelEditGroup').style.display = 'none';
         }
         
         function clearAll() {
@@ -772,7 +848,10 @@
                     <td><span class="verify-tag verify-${r.verify === '确认' ? 'confirm' : r.verify === '扣分' ? 'deduct' : 'cancel'}">${r.verify}</span></td>
                     <td class="${r.realScore > 0 ? 'score-positive' : r.realScore < 0 ? 'score-negative' : 'score-zero'}">${r.realScore}</td>
                     <td><textarea rows="1" onchange="updateNote(${r.id}, this.value)" placeholder="...">${r.note || ''}</textarea></td>
-                    <td><button class="btn btn-danger" onclick="deleteRecord(${r.id})">🗑 删除</button></td>
+                    <td>
+                        <button class="btn btn-edit" onclick="startEdit(${r.id})">✏ 编辑</button>
+                        <button class="btn btn-danger" onclick="deleteRecord(${r.id})">🗑</button>
+                    </td>
                 </tr>
             `).join('');
             
